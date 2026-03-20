@@ -1,0 +1,1 @@
+AI Quiz Agent is a simple application that uses artificial intelligence to generate quiz questions, evaluate user answers, and display scores. It provides an interactive and easy way for users to test their knowledge on different topics.
