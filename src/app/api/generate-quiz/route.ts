@@ -25,6 +25,7 @@ export async function POST(req: Request) {
             correctAnswer: "Option A",
             explanation: "This is a mock explanation since the Gemini API key is missing.",
           })),
+        tip: "This is a mock improvement tip. Make sure to review the core concepts of this topic in your textbook."
       });
     }
 
@@ -34,15 +35,20 @@ export async function POST(req: Request) {
     The difficulty level should be ${difficulty}.
     Generate exactly ${numQuestions} questions.
     Include a mix of multiple-choice and true/false questions.
-    Return the response as a pure JSON array of objects with the following structure:
-    [{
-      "question": "The question text",
-      "type": "mcq" | "boolean",
-      "options": ["Option 1", "Option 2", "Option 3", "Option 4"], // Only if type is mcq, omit if boolean
-      "correctAnswer": "The exact string of the correct option or 'True'/'False'",
-      "explanation": "Detailed explanation of why this is the correct answer"
-    }]
-    Important: Provide ONLY the valid JSON array. Do not include markdown blocks like \`\`\`json.`;
+    Return the response as a pure JSON object with the following structure:
+    {
+      "questions": [
+        {
+          "question": "The question text",
+          "type": "mcq" | "boolean",
+          "options": ["Option 1", "Option 2", "Option 3", "Option 4"], // Only if type is mcq, omit if boolean
+          "correctAnswer": "The exact string of the correct option or 'True'/'False'",
+          "explanation": "Detailed explanation of why this is the correct answer"
+        }
+      ],
+      "improvementTip": "A constructive, tailored piece of advice on how the user can improve or study further regarding this topic based on the chosen difficulty (${difficulty})."
+    }
+    Important: Provide ONLY the valid JSON object. Do not include markdown blocks like \`\`\`json.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -52,12 +58,15 @@ export async function POST(req: Request) {
     let quizData;
     try {
       quizData = JSON.parse(text);
+      if (!quizData.questions || !quizData.improvementTip) {
+          throw new Error("Missing questions or improvementTip in response");
+      }
     } catch (e) {
       console.error("Failed to parse Gemini response:", text);
       return NextResponse.json({ error: "Invalid AI response format" }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, quiz: quizData });
+    return NextResponse.json({ success: true, quiz: quizData.questions, tip: quizData.improvementTip });
   } catch (error) {
     console.error("Error generating quiz:", error);
     return NextResponse.json({ error: "Failed to generate quiz" }, { status: 500 });

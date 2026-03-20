@@ -15,10 +15,11 @@ interface Question {
 interface QuizViewProps {
   topic: string;
   initialQuestions: Question[];
+  tip?: string | null;
   onRestart: () => void;
 }
 
-export default function QuizView({ topic, initialQuestions, onRestart }: QuizViewProps) {
+export default function QuizView({ topic, initialQuestions, tip, onRestart }: QuizViewProps) {
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -81,6 +82,16 @@ export default function QuizView({ topic, initialQuestions, onRestart }: QuizVie
           <p className="text-xl text-slate-600 dark:text-slate-300">
             You scored <span className="font-bold text-indigo-500 text-3xl">{score}</span> out of {questions.length} on the topic of "{topic}".
           </p>
+          
+          {tip && (
+            <div className="w-full mt-4 p-6 bg-indigo-50/80 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-900/50 rounded-2xl text-left shadow-inner">
+              <h3 className="flex items-center gap-2 font-bold text-indigo-800 dark:text-indigo-300 uppercase tracking-widest text-sm mb-3">
+                <BrainCircuit className="w-4 h-4" /> Improvement Tip
+              </h3>
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{tip}</p>
+            </div>
+          )}
+
           <button
             onClick={onRestart}
             className="mt-4 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold text-lg transition-colors flex items-center gap-2 shadow-xl"
