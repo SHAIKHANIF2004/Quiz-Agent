@@ -8,8 +8,10 @@ import QuizView from "@/components/quiz-view";
 
 export default function Home() {
   const [topic, setTopic] = useState("");
+  const [difficulty, setDifficulty] = useState("medium");
   const [isGenerating, setIsGenerating] = useState(false);
   const [quizData, setQuizData] = useState<any[] | null>(null);
+  const [quizTip, setQuizTip] = useState<string | null>(null);
 
   const handleStartQuiz = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,11 +22,12 @@ export default function Home() {
       const res = await fetch("/api/generate-quiz", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, difficulty: "medium", numQuestions: 10 }),
+        body: JSON.stringify({ topic, difficulty, numQuestions: 10 }),
       });
       const data = await res.json();
       if (data.success && data.quiz) {
         setQuizData(data.quiz);
+        setQuizTip(data.tip || "Keep practicing this topic to master it!");
       } else {
         alert(data.error || "Failed to generate quiz.");
       }
@@ -77,6 +80,23 @@ export default function Home() {
                 <Sparkles className="absolute right-6 top-1/2 -translate-y-1/2 text-indigo-500 dark:text-indigo-400 w-6 h-6 animate-pulse" />
               </div>
 
+              <div className="flex flex-wrap gap-4 w-full justify-center mt-2">
+                {["easy", "medium", "hard"].map((level) => (
+                  <button
+                    key={level}
+                    type="button"
+                    onClick={() => setDifficulty(level)}
+                    className={`px-6 py-2 rounded-full font-bold transition-all capitalize ${
+                      difficulty === level
+                        ? "bg-indigo-600 text-white shadow-lg"
+                        : "bg-white/30 dark:bg-black/30 text-slate-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-black/50"
+                    }`}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+
               <button
                 type="submit"
                 disabled={isGenerating || !topic.trim()}
@@ -100,8 +120,10 @@ export default function Home() {
           <QuizView
             topic={topic}
             initialQuestions={quizData}
+            tip={quizTip}
             onRestart={() => {
               setQuizData(null);
+              setQuizTip(null);
               setTopic("");
             }}
           />
