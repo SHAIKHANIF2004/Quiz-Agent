@@ -120,6 +120,7 @@ export default function Home() {
           <QuizView
             topic={topic}
             initialQuestions={quizData}
+            initialDifficulty={difficulty}
             tip={quizTip}
             onRestart={() => {
               setQuizData(null);
