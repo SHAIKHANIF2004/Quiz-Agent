@@ -15,18 +15,19 @@ interface Question {
 interface QuizViewProps {
   topic: string;
   initialQuestions: Question[];
+  initialDifficulty: string;
   tip?: string | null;
   onRestart: () => void;
 }
 
-export default function QuizView({ topic, initialQuestions, tip, onRestart }: QuizViewProps) {
+export default function QuizView({ topic, initialQuestions, initialDifficulty, tip, onRestart }: QuizViewProps) {
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [difficulty, setDifficulty] = useState("medium");
+  const [difficulty, setDifficulty] = useState(initialDifficulty);
   const [isLoadingNext, setIsLoadingNext] = useState(false);
 
   const currentQuestion = questions[currentIndex];
